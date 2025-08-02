@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧮 Calculadora de Integrales - Cálculo II</title>
+    
+    <!-- Favicon simple para evitar 404 -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <script>
+        // Configurar MathJax antes de cargar
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                ready: () => {
+                    console.log('MathJax cargado correctamente');
+                    MathJax.startup.defaultReady();
+                }
+            }
+        };
+    </script>
+    <!-- MathJax para renderizar ecuaciones -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-section {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid #e9ecef;
+        }
+        
+        .results-panel {
+            background: #f1f3f4;
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid #dee2e6;
+            min-height: 400px;
+        }
+        
+        .graph-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            text-align: center;
+            min-height: 500px;
+        }
+        
+        .btn-calculate {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-calculate:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-calculate:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(45deg, #dc3545, #e74c3c);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-clear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .example-buttons .btn {
+            margin: 2px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .math-result {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            color: #721c24;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .graph-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .graph-image:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Modal para imagen en pantalla completa */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .image-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content-image {
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: scaleIn 0.3s ease;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        
+        .math-formula .MathJax {
+            font-size: 1.1em !important;
+        }
+        
+        /* Estilos para paso a paso */
+        .paso-a-paso-container {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            border: 2px solid #28a745;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.1);
+        }
+        
+        .paso-item {
+            background: white;
+            border-radius: 10px;
+            margin: 12px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border-left: 4px solid #007bff;
+        }
+        
+        .paso-header {
+            background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .paso-numero {
+            background: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .paso-descripcion {
+            flex: 1;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .paso-formula {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .paso-formula .MathJax {
+            font-size: 1.2em !important;
+        }
+        
+        /* Editor matemático visual */
+        .math-editor-container {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .math-input-display {
+            background: #f8f9fa;
+            padding: 15px;
+            min-height: 60px;
+            border-bottom: 1px solid #e9ecef;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .placeholder-text {
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .math-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .btn-math {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 40px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-math:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        
+        .btn-math:active {
+            transform: translateY(0);
+        }
+        
+        .btn-math sup {
+            font-size: 0.7em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="main-container mx-auto" style="max-width: 1400px;">
+            
+            <!-- Header -->
+            <div class="header-section">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-calculator"></i> Calculadora de Integrales
+                </h1>
+                <p class="lead mb-0">Cálculo II - Área bajo la curva y Volumen de revolución</p>
+            </div>
+            
+            <div class="row g-4 p-4">
+                
+                <!-- Panel de Controles -->
+                <div class="col-lg-4">
+                    <div class="control-panel h-100">
+                        <h4 class="fw-bold mb-4 text-primary">
+                            <i class="bi bi-gear-fill"></i> Parámetros de Cálculo
+                        </h4>
+                        
+                        <!-- Función -->
+                        <div class="mb-4">
+                            <label for="funcion" class="form-label fw-bold">Función f(x):</label>
+                            
+                            <!-- Editor matemático visual -->
+                            <div class="math-editor-container">
+                                <div class="math-input-display" id="math-display">
+                                    <span class="placeholder-text">Ingrese una función matemática</span>
+                                </div>
+                                
+                                <!-- Barra de herramientas matemáticas -->
+                                <div class="math-toolbar">
+                                    <button type="button" class="btn-math" onclick="insertMath('x')" title="Variable x">
+                                        <i>x</i>
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('**')" title="Exponente">
+                                        <span>x<sup>n</sup></span>
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('/')" title="División">
+                                        <span>⁄</span>
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('sqrt(')" title="Raíz cuadrada">
+                                        <span>√</span>
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('sin(')" title="Seno">
+                                        sin
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('cos(')" title="Coseno">
+                                        cos
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('tan(')" title="Tangente">
+                                        tan
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('log(')" title="Logaritmo natural">
+                                        ln
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('exp(')" title="Exponencial">
+                                        e<sup>x</sup>
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('pi')" title="Pi">
+                                        π
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath('(')" title="Paréntesis izquierdo">
+                                        (
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="insertMath(')')" title="Paréntesis derecho">
+                                        )
+                                    </button>
+                                    <button type="button" class="btn-math" onclick="clearMath()" title="Limpiar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Input oculto para la función -->
+                                <input type="text" class="form-control" id="funcion" 
+                                       placeholder="Ejemplo: x**2, sin(x), exp(x)" value="x**2" style="margin-top: 10px;">
+                            </div>
+                            
+                            <div class="form-text">
+                                <strong>Sintaxis:</strong> x**2 (potencia), sin(x), cos(x), exp(x), sqrt(x), log(x)
+                            </div>
+                        </div>
+                        
+                        <!-- Límites -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <label for="limite_a" class="form-label fw-bold">Límite a:</label>
+                                <input type="text" class="form-control" id="limite_a" value="0">
+                            </div>
+                            <div class="col-6">
+                                <label for="limite_b" class="form-label fw-bold">Límite b:</label>
+                                <input type="text" class="form-control" id="limite_b" value="2">
+                            </div>
+                        </div>
+                        
+                        <!-- Opciones -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Opciones de Cálculo:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="calcular_area" checked>
+                                <label class="form-check-label" for="calcular_area">
+                                    <i class="bi bi-graph-up text-success"></i> Calcular área bajo la curva
+                                </label>
+                            </div>
+                            <div class="form-check ms-4" style="margin-left: 1.5rem !important;">
+                                <input class="form-check-input" type="checkbox" id="mostrar_pasos_area">
+                                <label class="form-check-label" for="mostrar_pasos_area">
+                                    <i class="bi bi-list-ol text-success"></i> <small>Mostrar paso a paso (área)</small>
+                                </label>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="calcular_volumen">
+                                <label class="form-check-label" for="calcular_volumen">
+                                    <i class="bi bi-arrow-repeat text-info"></i> Calcular volumen de revolución (eje X)
+                                </label>
+                            </div>
+                            <div class="form-check ms-4" style="margin-left: 1.5rem !important;">
+                                <input class="form-check-input" type="checkbox" id="mostrar_pasos_volumen">
+                                <label class="form-check-label" for="mostrar_pasos_volumen">
+                                    <i class="bi bi-list-ol text-info"></i> <small>Mostrar paso a paso (volumen)</small>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones Principales -->
+                        <div class="mb-4">
+                            <button class="btn btn-calculate btn-primary w-100 mb-2" id="btn-calcular" onclick="calcular()">
+                                <i class="bi bi-play-circle-fill"></i> Calcular y Graficar
+                            </button>
+                            <button class="btn btn-clear btn-secondary w-100" onclick="limpiarTodo()">
+                                <i class="bi bi-arrow-clockwise"></i> Limpiar Todo
+                            </button>
+                        </div>
+                        
+                        <!-- Ejemplos Rápidos -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ejemplos Rápidos:</label>
+                            <div class="example-buttons">
+                                <button class="btn btn-outline-primary btn-sm" onclick="cargarEjemplo('parabola')">
+                                    Parábola
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" onclick="cargarEjemplo('seno')">
+                                    Seno
+                                </button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="cargarEjemplo('exponencial')">
+                                    Exponencial
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="cargarEjemplo('cubica')">
+                                    Cúbica
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Información -->
+                        <div class="info-box">
+                            <h6 class="fw-bold mb-2">
+                                <i class="bi bi-info-circle-fill"></i> Información
+                            </h6>
+                            <small>
+                                • Usa <code>**</code> para potencias: x**2<br>
+                                • Funciones disponibles: sin, cos, tan, exp, sqrt, log<br>
+                                • Constantes: pi, e<br>
+                                • Asegúrate que a &lt; b
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Panel de Resultados -->
+                <div class="col-lg-4">
+                    <div class="results-panel h-100">
+                        <h4 class="fw-bold mb-4 text-success">
+                            <i class="bi bi-clipboard-data-fill"></i> Resultados
+                        </h4>
+                        <div id="resultados-container">
+                            <div class="info-box">
+                                <h5 class="fw-bold mb-3">
+                                    <i class="bi bi-rocket-takeoff"></i> ¡Bienvenido!
+                                </h5>
+                                <p class="mb-2">Esta calculadora te permite:</p>
+                                <ul class="mb-3">
+                                    <li><strong>📐 Área:</strong> ∫[a→b] f(x)dx</li>
+                                    <li><strong>🔄 Volumen:</strong> π∫[a→b] [f(x)]²dx</li>
+                                    <li><strong>📊 Gráficos:</strong> Visualización en tiempo real</li>
+                                </ul>
+                                <p class="mb-0">
+                                    <strong>Instrucciones:</strong><br>
+                                    1. Ingresa tu función<br>
+                                    2. Define los límites a y b<br>
+                                    3. Selecciona qué calcular<br>
+                                    4. Presiona "Calcular y Graficar"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Panel de Gráfico -->
+                <div class="col-lg-4">
+                    <div class="graph-container h-100">
+                        <h4 class="fw-bold mb-4 text-info">
+                            <i class="bi bi-graph-up-arrow"></i> Visualización
+                        </h4>
+                        <div id="grafico-container">
+                            <div class="d-flex align-items-center justify-content-center" style="height: 400px;">
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-graph-up display-1 mb-3"></i>
+                                    <h5>Gráfico aparecerá aquí</h5>
+                                    <p>Ingresa una función y presiona calcular</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Función para mostrar/ocultar loading
+        function mostrarLoading(mostrar) {
+            const boton = document.getElementById('btn-calcular');
+            
+            if (!boton) {
+                console.error('Botón calcular no encontrado');
+                return;
+            }
+            
+            if (mostrar) {
+                boton.disabled = true;
+                boton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Calculando...';
+            } else {
+                boton.disabled = false;
+                boton.innerHTML = '<i class="bi bi-play-circle-fill"></i> Calcular y Graficar';
+            }
+        }
+        
+        // Función principal de cálculo
+        async function calcular() {
+            // Validación básica primero
+            const funcion = document.getElementById('funcion').value;
+            const limite_a = document.getElementById('limite_a').value;
+            const limite_b = document.getElementById('limite_b').value;
+            const calcular_area = document.getElementById('calcular_area').checked;
+            const calcular_volumen = document.getElementById('calcular_volumen').checked;
+            const mostrar_pasos_area = document.getElementById('mostrar_pasos_area').checked;
+            const mostrar_pasos_volumen = document.getElementById('mostrar_pasos_volumen').checked;
+            
+            if (!funcion.trim()) {
+                mostrarError('Por favor ingresa una función');
+                return;
+            }
+            
+            if (!limite_a.trim() || !limite_b.trim()) {
+                mostrarError('Por favor ingresa ambos límites');
+                return;
+            }
+            
+            if (!calcular_area && !calcular_volumen) {
+                mostrarError('Selecciona al menos una opción de cálculo');
+                return;
+            }
+            
+            // Mostrar loading solo después de validaciones exitosas
+            mostrarLoading(true);
+            
+            try {
+                const response = await fetch('/calcular', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        funcion: funcion,
+                        limite_a: limite_a,
+                        limite_b: limite_b,
+                        calcular_area: calcular_area,
+                        calcular_volumen: calcular_volumen,
+                        mostrar_pasos_area: mostrar_pasos_area,
+                        mostrar_pasos_volumen: mostrar_pasos_volumen
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    mostrarResultados(resultado);
+                    if (resultado.grafico) {
+                        mostrarGrafico(resultado.grafico);
+                    }
+                } else {
+                    mostrarError(resultado.error || 'Error desconocido en el cálculo');
+                }
+                
+            } catch (error) {
+                console.error('Error en calcular():', error);
+                mostrarError('Error de conexión: ' + error.message);
+            } finally {
+                // SIEMPRE ocultar loading al final
+                mostrarLoading(false);
+            }
+        }
+        
+        // Mostrar resultados
+        function mostrarResultados(resultado) {
+            let html = `
+                <div class="math-result">
+                    <h5 class="fw-bold text-success mb-3">
+                        <i class="bi bi-check-circle-fill"></i> Resultados del Cálculo
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <strong>📍 Función:</strong> f(x) = ${resultado.funcion}<br>
+                        <strong>📍 Intervalo:</strong> [${resultado.limite_a}, ${resultado.limite_b}]
+                    </div>
+            `;
+            
+            if (resultado.area) {
+                html += `
+                    <div class="mb-3">
+                        <h6 class="text-primary fw-bold">
+                            <i class="bi bi-graph-up"></i> Área bajo la curva:
+                        </h6>
+                        <div class="ms-3">
+                `;
+                
+                // Mostrar pasos si están disponibles
+                if (resultado.area.pasos && resultado.area.pasos.length > 0) {
+                    html += `
+                        <div class="paso-a-paso-container">
+                            <h6 class="text-primary fw-bold mb-3">
+                                <i class="bi bi-list-ol"></i> Proceso paso a paso:
+                            </h6>
+                    `;
+                    resultado.area.pasos.forEach((paso, index) => {
+                        html += `
+                            <div class="paso-item">
+                                <div class="paso-header">
+                                    <span class="paso-numero">Paso ${index + 1}</span>
+                                    <span class="paso-descripcion">${paso.descripcion}</span>
+                                </div>
+                                <div class="paso-formula">$$${paso.formula}$$</div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+                
+                html += `
+                            <strong>Forma simbólica:</strong><br>
+                            ∫[${resultado.limite_a}→${resultado.limite_b}] f(x)dx = ${resultado.area.simbolico}<br><br>
+                            <strong>Valor numérico:</strong><br>
+                            ≈ <span class="text-success fw-bold">${resultado.area.numerico.toFixed(8)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (resultado.volumen) {
+                html += `
+                    <div class="mb-3">
+                        <h6 class="text-info fw-bold">
+                            <i class="bi bi-arrow-repeat"></i> Volumen de revolución (eje X):
+                        </h6>
+                        <div class="ms-3">
+                `;
+                
+                // Mostrar pasos si están disponibles
+                if (resultado.volumen.pasos && resultado.volumen.pasos.length > 0) {
+                    html += `
+                        <div class="paso-a-paso-container">
+                            <h6 class="text-info fw-bold mb-3">
+                                <i class="bi bi-list-ol"></i> Proceso paso a paso:
+                            </h6>
+                    `;
+                    resultado.volumen.pasos.forEach((paso, index) => {
+                        html += `
+                            <div class="paso-item">
+                                <div class="paso-header">
+                                    <span class="paso-numero">Paso ${index + 1}</span>
+                                    <span class="paso-descripcion">${paso.descripcion}</span>
+                                </div>
+                                <div class="paso-formula">$$${paso.formula}$$</div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+                
+                html += `
+                            <strong>Forma simbólica:</strong><br>
+                            V = π∫[${resultado.limite_a}→${resultado.limite_b}] [f(x)]²dx<br>
+                            V = ${resultado.volumen.simbolico}<br><br>
+                            <strong>Valor numérico:</strong><br>
+                            ≈ <span class="text-info fw-bold">${resultado.volumen.numerico.toFixed(8)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                    <div class="text-muted mt-3">
+                        <small><i class="bi bi-clock"></i> Calculado: ${resultado.timestamp}</small>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultados-container').innerHTML = html;
+            
+            // Re-renderizar MathJax para el contenido dinámico
+            setTimeout(() => {
+                try {
+                    if (window.MathJax && window.MathJax.typesetPromise) {
+                        MathJax.typesetPromise([document.getElementById('resultados-container')])
+                            .then(() => {
+                                console.log('MathJax renderizado correctamente');
+                            })
+                            .catch(err => {
+                                console.log('Error renderizando MathJax:', err);
+                                // Fallback: intentar con el método anterior
+                                if (window.MathJax.Hub && window.MathJax.Hub.Queue) {
+                                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, "resultados-container"]);
+                                }
+                            });
+                    }
+                } catch (error) {
+                    console.log('MathJax no disponible:', error);
+                }
+            }, 100);
+        }
+        
+        // Mostrar gráfico
+        function mostrarGrafico(grafico_base64) {
+            try {
+                if (!grafico_base64) {
+                    console.warn('No se recibió imagen del gráfico');
+                    return;
+                }
+                
+                const html = `
+                    <img src="data:image/png;base64,${grafico_base64}" 
+                         class="graph-image" 
+                         alt="Gráfico de la función"
+                         onclick="abrirModal('data:image/png;base64,${grafico_base64}')"
+                         title="Haz clic para ver en pantalla completa"
+                         onload="console.log('Gráfico cargado correctamente')"
+                         onerror="console.error('Error cargando gráfico')">
+                `;
+                
+                const container = document.getElementById('grafico-container');
+                if (container) {
+                    container.innerHTML = html;
+                } else {
+                    console.error('Contenedor del gráfico no encontrado');
+                }
+            } catch (error) {
+                console.error('Error en mostrarGrafico():', error);
+            }
+        }
+        
+        // Mostrar error
+        function mostrarError(mensaje) {
+            const html = `
+                <div class="error-message">
+                    <h6 class="fw-bold text-danger mb-2">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Error
+                    </h6>
+                    <p class="mb-0">${mensaje}</p>
+                </div>
+            `;
+            document.getElementById('resultados-container').innerHTML = html;
+        }
+        
+        // Limpiar todo
+        function limpiarTodo() {
+            document.getElementById('funcion').value = 'x**2';
+            document.getElementById('limite_a').value = '0';
+            document.getElementById('limite_b').value = '2';
+            document.getElementById('calcular_area').checked = true;
+            document.getElementById('calcular_volumen').checked = false;
+            document.getElementById('mostrar_pasos_area').checked = false;
+            document.getElementById('mostrar_pasos_volumen').checked = false;
+            
+            // Restaurar contenido inicial
+            document.getElementById('resultados-container').innerHTML = `
+                <div class="info-box">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-rocket-takeoff"></i> ¡Bienvenido!
+                    </h5>
+                    <p class="mb-2">Esta calculadora te permite:</p>
+                    <ul class="mb-3">
+                        <li><strong>📐 Área:</strong> ∫[a→b] f(x)dx</li>
+                        <li><strong>🔄 Volumen:</strong> π∫[a→b] [f(x)]²dx</li>
+                        <li><strong>📊 Gráficos:</strong> Visualización en tiempo real</li>
+                    </ul>
+                    <p class="mb-0">
+                        <strong>Instrucciones:</strong><br>
+                        1. Ingresa tu función<br>
+                        2. Define los límites a y b<br>
+                        3. Selecciona qué calcular<br>
+                        4. Presiona "Calcular y Graficar"
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('grafico-container').innerHTML = `
+                <div class="d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <div class="text-center text-muted">
+                        <i class="bi bi-graph-up display-1 mb-3"></i>
+                        <h5>Gráfico aparecerá aquí</h5>
+                        <p>Ingresa una función y presiona calcular</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Cargar ejemplo
+        async function cargarEjemplo(nombre) {
+            try {
+                const response = await fetch(`/ejemplo/${nombre}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const ejemplo = data.ejemplo;
+                    document.getElementById('funcion').value = ejemplo.funcion;
+                    document.getElementById('limite_a').value = ejemplo.limite_a;
+                    document.getElementById('limite_b').value = ejemplo.limite_b;
+                    document.getElementById('calcular_area').checked = ejemplo.calcular_area;
+                    document.getElementById('calcular_volumen').checked = ejemplo.calcular_volumen;
+                }
+            } catch (error) {
+                console.error('Error cargando ejemplo:', error);
+            }
+        }
+        
+        // Permitir Enter para calcular
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calcular();
+            }
+        });
+        
+        // Funciones del editor matemático
+        function insertMath(symbol) {
+            const input = document.getElementById('funcion');
+            const display = document.getElementById('math-display');
+            
+            // Obtener la posición actual del cursor
+            const cursorPos = input.selectionStart;
+            const currentValue = input.value;
+            
+            // Insertar el símbolo en la posición del cursor
+            const newValue = currentValue.slice(0, cursorPos) + symbol + currentValue.slice(cursorPos);
+            input.value = newValue;
+            
+            // Actualizar el display visual
+            updateMathDisplay();
+            
+            // Mover el cursor después del símbolo insertado
+            const newCursorPos = cursorPos + symbol.length;
+            input.setSelectionRange(newCursorPos, newCursorPos);
+            input.focus();
+        }
+        
+        function clearMath() {
+            const input = document.getElementById('funcion');
+            const display = document.getElementById('math-display');
+            
+            input.value = '';
+            display.innerHTML = '<span class="placeholder-text">Ingrese una función matemática</span>';
+            input.focus();
+        }
+        
+        // Funciones para el modal de imagen
+        function abrirModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            
+            modalImg.src = imageSrc;
+            modal.classList.add('show');
+            
+            // Prevenir scroll en el body cuando el modal está abierto
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function cerrarModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
+            
+            // Restaurar scroll del body
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Cerrar modal al hacer clic fuera de la imagen
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('imageModal');
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    cerrarModal();
+                }
+            });
+            
+            // Cerrar modal con la tecla Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cerrarModal();
+                }
+            });
+        });
+        
+        function updateMathDisplay() {
+            const input = document.getElementById('funcion');
+            const display = document.getElementById('math-display');
+            
+            if (input.value.trim() === '') {
+                display.innerHTML = '<span class="placeholder-text">Ingrese una función matemática</span>';
+            } else {
+                // Mostrar la función con formato matemático visual
+                let displayText = input.value;
+                
+                // Reemplazar algunos símbolos para mejor visualización
+                displayText = displayText.replace(/\*\*/g, '^');
+                displayText = displayText.replace(/sqrt/g, '√');
+                displayText = displayText.replace(/pi/g, 'π');
+                displayText = displayText.replace(/\*/g, '·');
+                
+                display.innerHTML = displayText;
+            }
+        }
+        
+        // Inicializar el editor matemático
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('funcion');
+            
+            // Actualizar display cuando se escriba
+            input.addEventListener('input', updateMathDisplay);
+            
+            // Inicializar con valor por defecto
+            updateMathDisplay();
+        });
+    </script>
+    
+    <!-- Modal para imagen en pantalla completa -->
+    <div id="imageModal" class="image-modal">
+        <span class="modal-close" onclick="cerrarModal()">&times;</span>
+        <img id="modalImage" class="modal-content-image" alt="Gráfico en pantalla completa">
+    </div>
+</body>
+</html>
