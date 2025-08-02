@@ -45,12 +45,91 @@
             backdrop-filter: blur(10px);
         }
         
-        .header-section {
+                .header-section {
             background: linear-gradient(45deg, #2c3e50, #3498db);
             color: white;
-            border-radius: 20px 20px 0 0;
-            padding: 2rem;
+            border-radius: 15px;
+            padding: 1rem;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .university-header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
             text-align: center;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .university-logos {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo-container {
+            flex: 0 0 auto;
+            padding: 0 0.5rem;
+        }
+        
+        .logo-uth {
+            max-height: 70px;
+            width: auto;
+            filter: brightness(1.1);
+        }
+        
+        .logo-ingenieria {
+            max-height: 70px;
+            width: auto;
+            filter: brightness(1.1);
+        }
+        
+        .university-title {
+            flex: 1;
+            text-align: center;
+            margin: 0 1rem;
+        }
+        
+        .university-title h2 {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .university-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .university-logos {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .university-title {
+                margin: 0.5rem 0;
+            }
+            
+            .university-title h2 {
+                font-size: 1.3rem;
+            }
+            
+            .university-subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .logo-uth, .logo-ingenieria {
+                max-height: 50px;
+            }
         }
         
         .control-panel {
@@ -371,12 +450,36 @@
     <div class="container-fluid py-4">
         <div class="main-container mx-auto" style="max-width: 1400px;">
             
-            <!-- Header -->
-            <div class="header-section">
-                <h1 class="display-4 fw-bold mb-3">
+            <!-- University Header -->
+            <div class="university-header">
+                <div class="university-logos">
+                    <div class="logo-container">
+                        <!-- Logo UTH (lado izquierdo) -->
+                        <img src="/static/images/UTH.png" 
+                             alt="Universidad Tecnológica de Honduras" 
+                             class="logo-uth">
+                    </div>
+                    
+                    <div class="university-title">
+                        <h2>Universidad Tecnológica de Honduras</h2>
+                        <div class="university-subtitle">Ingeniería en Computación • Cálculo II</div>
+                    </div>
+                    
+                    <div class="logo-container">
+                        <!-- Logo Ingeniería (lado derecho) -->
+                        <img src="/static/images/IC.png" 
+                             alt="Ingeniería en Computación" 
+                             class="logo-ingenieria">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Calculator Header -->
+            <div class="header-section" style="text-align: center;">
+                <h2 class="fw-bold mb-3" style="font-size: 1.6rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3); margin: 0;">
                     <i class="bi bi-calculator"></i> Calculadora de Integrales
-                </h1>
-                <p class="lead mb-0">Cálculo II - Área bajo la curva y Volumen de revolución</p>
+                </h2>
+                <p class="mb-0" style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.3rem;">Cálculo II - Área bajo la curva y Volumen de revolución</p>
             </div>
             
             <div class="row g-4 p-4">

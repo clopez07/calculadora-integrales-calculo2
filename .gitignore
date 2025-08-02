@@ -60,3 +60,7 @@ instance/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Archivos de imágenes grandes (opcional)
+# static/images/*.png
+# static/images/*.jpg
